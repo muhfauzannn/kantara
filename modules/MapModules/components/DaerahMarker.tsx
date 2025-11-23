@@ -33,10 +33,10 @@ export default function DaerahMarker({ daerah, icon }: DaerahMarkerProps) {
 
   // Create a custom icon with hover effect
   const hoverIcon = new Icon({
-    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    iconUrl: "/icon/bali.png",
     iconRetinaUrl:
-      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      "/icon/bali@2x.png",
+    // shadowUrl: "/icon/bali-shadow.png",
     iconSize: [30, 48], // Slightly larger on hover
     iconAnchor: [15, 48],
     popupAnchor: [1, -34],
@@ -77,27 +77,6 @@ export default function DaerahMarker({ daerah, icon }: DaerahMarkerProps) {
         click: handleClick,
       }}
     >
-      {/* Tooltip for hover effect */}
-      <Tooltip
-        permanent={false}
-        direction="top"
-        offset={[0, -40]}
-        className="custom-tooltip"
-      >
-        <div className="bg-white p-2 rounded shadow-lg border">
-          <h4 className="font-semibold text-sm text-gray-800">{daerah.nama}</h4>
-          <p className="text-xs text-gray-600 mt-1 max-w-40 line-clamp-2">
-            {daerah.description.length > 60
-              ? `${daerah.description.substring(0, 60)}...`
-              : daerah.description}
-          </p>
-          {daerah.kebudayaans.length > 0 && (
-            <p className="text-xs text-blue-600 mt-1">
-              {daerah.kebudayaans.length} kebudayaan
-            </p>
-          )}
-        </div>
-      </Tooltip>
 
       {/* Popup for detailed information */}
       <Popup
