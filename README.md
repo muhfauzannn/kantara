@@ -1,8 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kantara - Indonesian Culture Explorer
+
+Kantara AI adalah platform berbasis web yang memanfaatkan kecerdasan buatan untuk melestarikan dan mengeksplorasi budaya Indonesia secara interaktif. Melalui peta dinamis dan chatbot budaya, pengguna dapat menelusuri, memahami, dan terhubung dengan kekayaan budaya Nusantara.
+
+## Features
+
+- 🗺️ **Peta Budaya Interaktif** - Jelajahi budaya 38 provinsi Indonesia melalui peta interaktif
+- 🤖 **Chatbot Budaya AI** - Tanyakan apa saja tentang budaya Indonesia dengan AI bertenaga Gemini
+- 🎨 **Database Budaya** - Informasi lengkap tentang kesenian, makanan, rumah adat, dan suku
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ installed
+- pnpm package manager
+- Gemini API Key ([Get it here](https://makersuite.google.com/app/apikey))
+
+### Installation
+
+1. Clone the repository
+
+```bash
+git clone <repository-url>
+cd kantara
+```
+
+2. Install dependencies
+
+```bash
+pnpm install
+```
+
+3. Setup environment variables
+
+```bash
+cp .env.example .env.local
+```
+
+4. Add your Gemini API key to `.env.local`
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+5. Setup the database
+
+```bash
+pnpm db:seed
+```
+
+### Run the development server
 
 ```bash
 npm run dev
