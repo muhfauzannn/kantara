@@ -1,7 +1,8 @@
 // Test script to verify Prisma client works correctly
 // Run with: node test-prisma.mjs
 
-import { PrismaClient } from "./lib/generated/prisma/client.js";
+import { PrismaClient } from "@prisma/client";
+
 
 const prisma = new PrismaClient();
 
