@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPrismaClientClass } from "../../../lib/generated/prisma/internal/class";
-
-const PrismaClient = getPrismaClientClass(__dirname);
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
-  const prisma = new PrismaClient();
-
   try {
     const daerah = await prisma.daerah.findMany({
       where: {
@@ -45,7 +41,5 @@ export async function GET(request: NextRequest) {
       },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

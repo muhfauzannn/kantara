@@ -1,7 +1,5 @@
 import "dotenv/config";
-import { getPrismaClientClass } from "../lib/generated/prisma/internal/class";
-
-const PrismaClient = getPrismaClientClass(__dirname);
+import { PrismaClient } from "../lib/generated/prisma/client";
 
 const prisma = new PrismaClient();
 

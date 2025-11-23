@@ -2,23 +2,13 @@ import { cache } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import DaerahModules from "@/modules/DaerahModules";
-import { PrismaClient } from "@/lib/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
 
 type PageProps = {
   params: Promise<{
     id: string;
   }>;
 };
-
-const globalForPrisma = globalThis as unknown as {
-  prisma?: PrismaClient;
-};
-
-const prisma = globalForPrisma.prisma ?? new PrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
 
 const getDaerah = cache(async (id: string) => {
   return prisma.daerah.findUnique({
