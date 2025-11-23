@@ -45,8 +45,11 @@ const category = [
 
 const DaerahModules = ({ daerah }: DaerahModulesProps) => {
   const heroImage = daerah.backgroundImg ?? daerah.images[0];
-  const galleryImages = daerah.images.slice(0, 6);
+  const galleryImages = daerah.images.slice(0, 4);
   const museumItems = daerah.kebudayaans;
+
+  // Duplicate images for infinite scroll
+  const duplicatedImages = [...galleryImages, ...galleryImages];
 
   return (
     <div className="flex flex-col gap-10 pb-10">
@@ -68,7 +71,7 @@ const DaerahModules = ({ daerah }: DaerahModulesProps) => {
 
       <section className="flex flex-col gap-2 px-12 max-lg:px-10 max-md:px-8 max-sm:px-6">
         <p className="font-bold text-xl">Kebudayaan {daerah.nama}</p>
-        <div className="flex gap-5 max-lg:justify-center">
+        <div className="flex gap-5 max-lg:justify-center overflow-y-auto">
           {category.map((category) => (
             <Card
               key={category.title}
@@ -80,7 +83,7 @@ const DaerahModules = ({ daerah }: DaerahModulesProps) => {
         </div>
       </section>
       <section className="flex flex-col gap-4 px-12 max-lg:px-10 max-md:px-8 max-sm:px-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 overflow-y-auto">
           <p className="font-bold text-xl">Explore</p>
           {museumItems.length > 4 && (
             <Link
@@ -126,38 +129,64 @@ const DaerahModules = ({ daerah }: DaerahModulesProps) => {
         )}
       </section>
 
-      <section className="flex flex-col gap-4 px-12 max-lg:px-10 max-md:px-8 max-sm:px-6">
-        <div className="flex items-center justify-between gap-4">
+      <section className="flex flex-col gap-4 overflow-hidden">
+        <div className="flex items-center justify-between gap-4 px-12 max-lg:px-10 max-md:px-8 max-sm:px-6">
           <p className="font-bold text-xl">Jelajahi Daerah Ini</p>
-          {galleryImages.length > 3 && (
-            <span className="hidden items-center gap-2 text-sm font-medium text-gray-500 md:flex">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600">
-                <ChevronLeft className="h-4 w-4" />
-              </span>
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600">
-                <ChevronRight className="h-4 w-4" />
-              </span>
-            </span>
-          )}
         </div>
         {galleryImages.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+          <div className="mx-12 max-lg:mx-10 max-md:mx-8 max-sm:mx-6 rounded-xl border border-dashed border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
             Belum ada dokumentasi visual untuk daerah ini.
           </div>
         ) : (
-          <div className="grid gap-5 md:grid-cols-3">
-            {galleryImages.map((image, index) => (
+          <div className="flex gap-[1.5vw] animate-scroll-left pointer-events-none">
+            {[...duplicatedImages, ...duplicatedImages].map((_, slideIndex) => (
               <div
-                key={`${image}-${index}`}
-                className="relative aspect-4/3 w-full overflow-hidden rounded-2xl bg-slate-200 shadow-sm"
+                key={slideIndex}
+                className="w-screen max-w-[717px] lg:max-w-[70vw] aspect-video grid grid-cols-3 grid-rows-2 gap-[1.5vw] shrink-0"
               >
-                <Image
-                  src={image}
-                  alt={`${daerah.nama} - Eksplorasi ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
+                {/* Top Left - Span 2 columns */}
+                <div className="col-span-2 relative overflow-hidden rounded-[1.5vw] bg-slate-200">
+                  <Image
+                    src={galleryImages[0 % galleryImages.length]}
+                    alt={`${daerah.nama} - Eksplorasi 1`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 70vw"
+                  />
+                </div>
+
+                {/* Top Right - 1 column */}
+                <div className="relative overflow-hidden rounded-[1.5vw] bg-slate-200">
+                  <Image
+                    src={galleryImages[1 % galleryImages.length]}
+                    alt={`${daerah.nama} - Eksplorasi 2`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 23vw"
+                  />
+                </div>
+
+                {/* Bottom Left - 1 column */}
+                <div className="relative overflow-hidden rounded-[1.5vw] bg-slate-200">
+                  <Image
+                    src={galleryImages[2 % galleryImages.length]}
+                    alt={`${daerah.nama} - Eksplorasi 3`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 23vw"
+                  />
+                </div>
+
+                {/* Bottom Right - Span 2 columns */}
+                <div className="col-span-2 relative overflow-hidden rounded-[1.5vw] bg-slate-200">
+                  <Image
+                    src={galleryImages[3 % galleryImages.length]}
+                    alt={`${daerah.nama} - Eksplorasi 4`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 70vw"
+                  />
+                </div>
               </div>
             ))}
           </div>

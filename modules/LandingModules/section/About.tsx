@@ -75,7 +75,7 @@ export const Card = ({
   return (
     <Link
       href={href}
-      className="flex flex-col w-40 text-center text-white bg-red-500 hover:bg-red-400 transition-colors justify-center px-5 h-40 gap-2 items-center"
+      className="flex shrink-0 flex-col w-40 text-center text-white bg-red-500 hover:bg-red-400 transition-colors justify-center px-5 h-40 gap-2 items-center"
     >
       {icon}
       {title}
