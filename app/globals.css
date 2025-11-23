@@ -221,16 +221,6 @@
   border: 1px solid #e5e7eb !important;
 }
 
-/* Hover effects for markers */
-.leaflet-marker-icon {
-  transition: all 0.2s ease-in-out !important;
-}
-
-.leaflet-marker-icon:hover {
-  transform: scale(1.1) !important;
-  z-index: 1000 !important;
-}
-
 /* Custom scrollbar for popup content */
 .custom-popup .leaflet-popup-content::-webkit-scrollbar {
   width: 4px;

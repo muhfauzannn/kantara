@@ -1,8 +1,8 @@
 "use client";
 
-import { Marker, Popup, Tooltip } from "react-leaflet";
-import { Icon } from "leaflet";
-import { useState, useRef } from "react";
+import { Marker, Popup } from "react-leaflet";
+import { Icon, Marker as LeafletMarker } from "leaflet";
+import { useMemo, useRef } from "react";
 import DaerahPopup from "./DaerahPopup";
 
 interface DaerahData {
@@ -28,36 +28,19 @@ interface DaerahMarkerProps {
 }
 
 export default function DaerahMarker({ daerah, icon }: DaerahMarkerProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const markerRef = useRef<any>(null);
+  const markerRef = useRef<LeafletMarker | null>(null);
 
-  // Create a custom icon with hover effect
-  const hoverIcon = new Icon({
-    iconUrl: "/icon/bali.png",
-    iconRetinaUrl:
-      "/icon/bali@2x.png",
-    // shadowUrl: "/icon/bali-shadow.png",
-    iconSize: [30, 48], // Slightly larger on hover
-    iconAnchor: [15, 48],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });
-
-  const handleMouseOver = () => {
-    setIsHovered(true);
-    if (markerRef.current) {
-      // Open tooltip on hover
-      markerRef.current.openTooltip();
+  const markerIcon = useMemo(() => {
+    if (!daerah.icon) {
+      return icon;
     }
-  };
 
-  const handleMouseOut = () => {
-    setIsHovered(false);
-    if (markerRef.current) {
-      // Close tooltip on mouse out
-      markerRef.current.closeTooltip();
-    }
-  };
+    return new Icon({
+      ...icon.options,
+      iconUrl: daerah.icon,
+      iconRetinaUrl: daerah.icon,
+    });
+  }, [daerah.icon, icon]);
 
   const handleClick = () => {
     if (markerRef.current) {
@@ -70,14 +53,11 @@ export default function DaerahMarker({ daerah, icon }: DaerahMarkerProps) {
     <Marker
       ref={markerRef}
       position={[daerah.latitude, daerah.longitude]}
-      icon={isHovered ? hoverIcon : icon}
+      icon={markerIcon}
       eventHandlers={{
-        mouseover: handleMouseOver,
-        mouseout: handleMouseOut,
         click: handleClick,
       }}
     >
-
       {/* Popup for detailed information */}
       <Popup
         minWidth={320}
