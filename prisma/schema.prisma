@@ -11,4 +11,43 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Daerah {
+  id          String   @id @default(uuid())
+  nama        String
+  description String
+  longitude   Float?
+  latitude    Float?
+  icon        String?
+  backgroundImg String?
+  images      String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  kebudayaans Kebudayaan[]
+
+  @@map("daerah")
+}
+
+enum jenisKebudayaan {
+  SUKU_ADAT
+  RUMAH_ADAT
+  MAKANAN_KHAS
+  KESENIAN_DAERAH
+}
+model Kebudayaan {
+  id           String          @id @default(uuid())
+  nama          String
+  description   String
+  jenis         jenisKebudayaan
+  virtualTour  String?
+  daerahId      String
+  daerah        Daerah         @relation(fields: [daerahId], references: [id])
+  images        String[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("kebudayaan")
 }

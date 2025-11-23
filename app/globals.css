@@ -191,3 +191,61 @@
     font-family: "Montserrat", sans-serif;
   }
 }
+
+/* Custom styles for Leaflet tooltips and popups */
+.custom-tooltip .leaflet-tooltip {
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+  border-radius: 0.5rem !important;
+  padding: 0 !important;
+}
+
+.custom-tooltip .leaflet-tooltip-top:before {
+  border-top-color: white !important;
+}
+
+.custom-popup .leaflet-popup-content-wrapper {
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1) !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.custom-popup .leaflet-popup-content {
+  margin: 0 !important;
+  padding: 1rem !important;
+}
+
+.custom-popup .leaflet-popup-tip {
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+/* Hover effects for markers */
+.leaflet-marker-icon {
+  transition: all 0.2s ease-in-out !important;
+}
+
+.leaflet-marker-icon:hover {
+  transform: scale(1.1) !important;
+  z-index: 1000 !important;
+}
+
+/* Custom scrollbar for popup content */
+.custom-popup .leaflet-popup-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-popup .leaflet-popup-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.custom-popup .leaflet-popup-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.custom-popup .leaflet-popup-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
