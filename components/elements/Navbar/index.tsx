@@ -2,7 +2,7 @@
 
 import { navbarItems } from "./const";
 import Link from "next/link";
-import { Input } from "../ui/input";
+import { Input } from "../../ui/input";
 import { Search, Menu, X } from "lucide-react";
 import { useState } from "react";
 
@@ -14,7 +14,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="px-12 fixed top-0 left-0 right-0 py-4 bg-red-700 text-white max-lg:px-10 max-md:px-8 max-sm:px-6">
+    <nav className="fixed top-0 z-100 left-0 right-0 py-4 bg-red-700 text-white px-12 max-lg:px-10 max-md:px-8 max-sm:px-6">
       <div className="flex justify-between items-center">
         {/* Logo */}
         <h1 className="text-3xl max-lg:text-2xl max-md:text-xl font-gotu z-20 relative">
