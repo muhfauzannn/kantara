@@ -38,16 +38,13 @@ const About = () => {
           pengalaman digital yang kontekstual dan menarik.
         </p>
         <div className="flex gap-5 max-lg:justify-center">
-          {/* <div className="bg-"></div> */}
           {Feature.map((feature) => (
-            <Link
-              key={feature.href}
+            <Card
+              key={feature.title}
+              title={feature.title}
               href={feature.href}
-              className="flex flex-col w-40 text-center text-white bg-red-500 hover:bg-red-400 transition-colors justify-center px-5 h-40 gap-2 items-center"
-            >
-              {feature.icon}
-              {feature.title}
-            </Link>
+              icon={feature.icon}
+            />
           ))}
         </div>
       </div>
@@ -65,3 +62,23 @@ const About = () => {
   );
 };
 export default About;
+
+export const Card = ({
+  title,
+  href,
+  icon,
+}: {
+  title: string;
+  href: string;
+  icon: React.ReactNode;
+}) => {
+  return (
+    <Link
+      href={href}
+      className="flex flex-col w-40 text-center text-white bg-red-500 hover:bg-red-400 transition-colors justify-center px-5 h-40 gap-2 items-center"
+    >
+      {icon}
+      {title}
+    </Link>
+  );
+};

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface DaerahData {
   id: string;
@@ -120,30 +122,11 @@ export default function DaerahPopup({ daerah }: DaerahPopupProps) {
           </div>
         </div>
       )}
-
-      {/* Kebudayaan List */}
-      {daerah.kebudayaans.length > 0 && (
-        <div className="border-t pt-2">
-          <h4 className="font-semibold text-sm text-gray-700 mb-2">
-            Kebudayaan ({daerah.kebudayaans.length})
-          </h4>
-          <div className="space-y-1 max-h-24 overflow-y-auto">
-            {daerah.kebudayaans.slice(0, 3).map((kebudayaan) => (
-              <div key={kebudayaan.id} className="text-xs text-gray-600">
-                <span className="font-medium">{kebudayaan.nama}</span>
-                <span className="ml-2 text-gray-500">
-                  ({kebudayaan.jenis.replace(/_/g, " ")})
-                </span>
-              </div>
-            ))}
-            {daerah.kebudayaans.length > 3 && (
-              <div className="text-xs text-gray-500 italic">
-                dan {daerah.kebudayaans.length - 3} lainnya...
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <Link href={`/daerah/${daerah.id}`}>
+        <Button className="w-full cursor-pointer" variant={"ghost"}>
+          Lihat Selengkapnya
+        </Button>
+      </Link>
     </div>
   );
 }
