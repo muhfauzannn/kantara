@@ -8,6 +8,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-gotu: var(--font-gotu);
+  --font-montserrat: var(--font-montserrat);
 
   --color-red-50: var(--red-50);
   --color-red-100: var(--red-100);
@@ -185,5 +187,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Montserrat", sans-serif;
   }
 }
