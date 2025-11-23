@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Prisma } from "@/lib/generated/prisma/client";
+import type { Prisma } from "@prisma/client";
+
 import {
   Leaf,
   House,
