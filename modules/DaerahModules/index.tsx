@@ -55,7 +55,7 @@ const DaerahModules = ({ daerah }: DaerahModulesProps) => {
     <div className="flex flex-col gap-10 pb-10">
       <section className="min-h-screen relative flex items-center">
         <Image
-          src={heroImage}
+          src="/daerah-detail.png"
           alt={daerah.nama}
           fill
           className="object-cover "
