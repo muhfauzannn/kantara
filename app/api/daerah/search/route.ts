@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { fallbackDaerahData } from "@/lib/data/fallback-daerah";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -17,6 +18,36 @@ export async function GET(request: NextRequest) {
         },
         { status: 400 }
       );
+    }
+
+    const matchFallbackData = (keyword: string) => {
+      const normalized = keyword.toLowerCase();
+      return fallbackDaerahData.filter((daerah) => {
+        const matchNama = daerah.nama.toLowerCase().includes(normalized);
+        const matchDescription = daerah.description
+          .toLowerCase()
+          .includes(normalized);
+        const matchKebudayaan = daerah.kebudayaans.some(
+          (k) =>
+            k.nama.toLowerCase().includes(normalized) ||
+            k.description.toLowerCase().includes(normalized)
+        );
+        return matchNama || matchDescription || matchKebudayaan;
+      });
+    };
+
+    if (!prisma) {
+      const fallbackMatches = matchFallbackData(query);
+      return NextResponse.json({
+        success: true,
+        data: fallbackMatches,
+        matchedBy: fallbackMatches.length ? "fallback_search" : "none",
+        summary:
+          fallbackMatches.length > 0
+            ? `Ditemukan ${fallbackMatches.length} daerah yang cocok dengan pencarian "${query}" (mode offline)`
+            : `Tidak ada daerah yang cocok dengan pencarian "${query}" pada data offline.`,
+        fallback: true,
+      });
     }
 
     // Step 1: Try basic filtering by nama, description, and kebudayaans
@@ -269,6 +300,28 @@ Contoh response yang benar:
     });
   } catch (error) {
     console.error("Error in search:", error);
+    const fallbackMatches = fallbackDaerahData.filter((daerah) => {
+      const keyword = request.nextUrl.searchParams.get("q")?.toLowerCase();
+      if (!keyword) return false;
+      return (
+        daerah.nama.toLowerCase().includes(keyword) ||
+        daerah.description.toLowerCase().includes(keyword) ||
+        daerah.kebudayaans.some(
+          (k) =>
+            k.nama.toLowerCase().includes(keyword) ||
+            k.description.toLowerCase().includes(keyword)
+        )
+      );
+    });
+    if (fallbackMatches.length > 0) {
+      return NextResponse.json({
+        success: true,
+        data: fallbackMatches,
+        matchedBy: "fallback_error_recovery",
+        summary: `Database tidak dapat diakses, tetapi ditemukan ${fallbackMatches.length} hasil dari data offline.`,
+        fallback: true,
+      });
+    }
     return NextResponse.json(
       {
         success: false,

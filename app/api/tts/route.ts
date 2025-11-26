@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate detailed narration using Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `Anda adalah pemandu wisata budaya Indonesia yang ramah dan informatif. 
 Buatkan narasi audio yang menarik dan edukatif tentang daerah "${daerahNama}" dalam bahasa Indonesia.
@@ -49,7 +49,7 @@ Jangan gunakan markdown atau format khusus, hanya teks biasa yang siap dibacakan
       "EXAVITQu4vr4xnSDxMaL",
       {
         text: narrationText,
-        modelId: "eleven_multilingual_v2",
+        modelId: "eleven_v3",
         voiceSettings: {
           stability: 0.5,
           similarityBoost: 0.75,

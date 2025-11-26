@@ -1,8 +1,22 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { Search } from "lucide-react";
 
 const Hero = () => {
+  const [keyword, setKeyword] = useState("");
+  const router = useRouter();
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const value = keyword.trim();
+    if (!value) return;
+    router.push(`/search?q=${encodeURIComponent(value)}`);
+  };
+
   return (
     <section className="min-h-screen relative flex items-center">
       <Image
@@ -20,11 +34,22 @@ const Hero = () => {
             dirancang untuk menghidupkan kembali warisan tiap provinsi.
           </p>
         </div>
-        <Input
-          className="w-full bg-white text-black placeholder:text-black/50"
-          placeholder="Cari..."
-          rightIcon={<Search className="w-5 h-5 text-black/50" />}
-        />
+        <form onSubmit={handleSubmit}>
+          <Input
+            className="w-full bg-white text-black placeholder:text-black/50"
+            placeholder="Cari..."
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            rightIcon={
+              <button
+                type="submit"
+                className="p-1 rounded-md hover:bg-black/10 transition-colors"
+              >
+                <Search className="w-5 h-5 text-black/60" />
+              </button>
+            }
+          />
+        </form>
       </div>
     </section>
   );

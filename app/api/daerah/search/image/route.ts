@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { fallbackDaerahData } from "@/lib/data/fallback-daerah";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -25,26 +26,28 @@ export async function POST(request: NextRequest) {
     const base64Image = buffer.toString("base64");
 
     // Get all daerah data for Gemini to analyze
-    const allDaerah = await prisma.daerah.findMany({
-      select: {
-        id: true,
-        nama: true,
-        description: true,
-        latitude: true,
-        longitude: true,
-        icon: true,
-        backgroundImg: true,
-        images: true,
-        kebudayaans: {
+    const allDaerah = prisma
+      ? await prisma.daerah.findMany({
           select: {
             id: true,
             nama: true,
-            jenis: true,
             description: true,
+            latitude: true,
+            longitude: true,
+            icon: true,
+            backgroundImg: true,
+            images: true,
+            kebudayaans: {
+              select: {
+                id: true,
+                nama: true,
+                jenis: true,
+                description: true,
+              },
+            },
           },
-        },
-      },
-    });
+        })
+      : fallbackDaerahData;
 
     if (allDaerah.length === 0) {
       return NextResponse.json({
@@ -189,31 +192,33 @@ Contoh response yang benar:
     );
 
     // Fetch the matched daerah
-    const matchedDaerah = await prisma.daerah.findMany({
-      where: {
-        id: {
-          in: ids,
-        },
-      },
-      select: {
-        id: true,
-        nama: true,
-        description: true,
-        latitude: true,
-        longitude: true,
-        icon: true,
-        backgroundImg: true,
-        images: true,
-        kebudayaans: {
+    const matchedDaerah = prisma
+      ? await prisma.daerah.findMany({
+          where: {
+            id: {
+              in: ids,
+            },
+          },
           select: {
             id: true,
             nama: true,
-            jenis: true,
+            description: true,
+            latitude: true,
+            longitude: true,
+            icon: true,
+            backgroundImg: true,
             images: true,
+            kebudayaans: {
+              select: {
+                id: true,
+                nama: true,
+                jenis: true,
+                images: true,
+              },
+            },
           },
-        },
-      },
-    });
+        })
+      : fallbackDaerahData.filter((daerah) => ids.includes(daerah.id));
 
     // Add explanations and confidence to matched daerah
     const daerahWithExplanations = matchedDaerah.map((daerah) => {
