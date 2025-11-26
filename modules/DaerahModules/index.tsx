@@ -8,10 +8,7 @@ import {
   Utensils,
   LineSquiggle,
   ArrowUpRight,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
-import { Card } from "../LandingModules/section/About";
 
 type DaerahWithRelations = Prisma.DaerahGetPayload<{
   include: { kebudayaans: true };
@@ -74,12 +71,13 @@ const DaerahModules = ({ daerah }: DaerahModulesProps) => {
         <p className="font-bold text-xl">Kebudayaan {daerah.nama}</p>
         <div className="flex gap-5 max-lg:justify-center overflow-y-auto">
           {category.map((category) => (
-            <Card
+            <div
               key={category.title}
-              title={category.title}
-              href={category.href}
-              icon={category.icon}
-            />
+              className="flex shrink-0 flex-col w-40 text-center text-white bg-red-500 hover:bg-red-400 transition-colors justify-center px-5 h-40 gap-2 items-center"
+            >
+              {category.icon}
+              {category.title}
+            </div>
           ))}
         </div>
       </section>

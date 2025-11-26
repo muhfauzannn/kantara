@@ -1,22 +1,32 @@
+import { jenisKebudayaan } from "@prisma/client";
+
 type FallbackKebudayaan = {
   id: string;
   nama: string;
-  jenis: string;
+  jenis: jenisKebudayaan;
   images: string[];
   description: string;
+  createdAt: Date;
+  updatedAt: Date;
+  virtualTour: string | null;
+  daerahId: string;
 };
 
 export type FallbackDaerah = {
   id: string;
   nama: string;
   description: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   icon: string | null;
   backgroundImg: string | null;
   images: string[];
+  createdAt: Date;
+  updatedAt: Date;
   kebudayaans: FallbackKebudayaan[];
 };
+
+const now = new Date();
 
 export const fallbackDaerahData: FallbackDaerah[] = [
   {
@@ -29,6 +39,8 @@ export const fallbackDaerahData: FallbackDaerah[] = [
     icon: "/icon/bali.png",
     backgroundImg: null,
     images: ["/kesenian/kesenian1.jpg", "/rumah/rumah1.jpeg"],
+    createdAt: now,
+    updatedAt: now,
     kebudayaans: [
       {
         id: "fallback-jakarta-suku",
@@ -37,6 +49,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/suku/suku1.jpeg"],
         description:
           "Suku asli Jakarta dengan perpaduan budaya Arab, Tionghoa, dan Eropa.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-jakarta",
       },
       {
         id: "fallback-jakarta-makanan",
@@ -45,6 +61,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/makanan/makanan1.webp"],
         description:
           "Kuliner khas Betawi berbahan ketan dan telur dengan cita rasa gurih.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-jakarta",
       },
       {
         id: "fallback-jakarta-kesenian",
@@ -53,6 +73,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/kesenian/kesenian1.jpg"],
         description:
           "Pertunjukan tari dengan topeng karakter mencerminkan dinamika kehidupan kota.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-jakarta",
       },
     ],
   },
@@ -66,6 +90,8 @@ export const fallbackDaerahData: FallbackDaerah[] = [
     icon: "/icon/bali.png",
     backgroundImg: null,
     images: ["/kesenian/kesenian2.jpeg", "/rumah/rumah2.jpg"],
+    createdAt: now,
+    updatedAt: now,
     kebudayaans: [
       {
         id: "fallback-jabar-suku",
@@ -74,6 +100,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/suku/suku2.jpeg"],
         description:
           "Suku besar di Tatar Pasundan dengan filosofi silih asah, silih asih.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-jabar",
       },
       {
         id: "fallback-jabar-kesenian",
@@ -82,6 +112,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/kesenian/kesenian7.webp"],
         description:
           "Tari dinamis yang memadukan gerakan ketuk tilu dan pencak silat.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-jabar",
       },
       {
         id: "fallback-jabar-makanan",
@@ -90,6 +124,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/makanan/makanan2.jpg"],
         description:
           "Nasi hangat dibungkus daun pisang dengan lauk lalap dan sambal.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-jabar",
       },
     ],
   },
@@ -103,6 +141,8 @@ export const fallbackDaerahData: FallbackDaerah[] = [
     icon: "/icon/bali.png",
     backgroundImg: null,
     images: ["/kesenian/kesenian6.jpg", "/rumah/rumah4.jpg"],
+    createdAt: now,
+    updatedAt: now,
     kebudayaans: [
       {
         id: "fallback-bali-kesenian",
@@ -111,6 +151,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/kesenian/kesenian6.jpg"],
         description:
           "Tari kolosal dengan paduan suara 'cak' menggambarkan kisah Ramayana.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-bali",
       },
       {
         id: "fallback-bali-makanan",
@@ -119,6 +163,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/makanan/makanan4.jpg"],
         description:
           "Bebek berbumbu rempah lengkap yang dimasak perlahan dalam balutan daun.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-bali",
       },
       {
         id: "fallback-bali-rumah",
@@ -127,6 +175,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/rumah/rumah4.jpg"],
         description:
           "Pintu masuk khas arsitektur Bali yang melambangkan keseimbangan sekala-niskala.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-bali",
       },
     ],
   },
@@ -140,6 +192,8 @@ export const fallbackDaerahData: FallbackDaerah[] = [
     icon: "/icon/bali.png",
     backgroundImg: null,
     images: ["/kesenian/kesenian5.jpeg", "/rumah/rumah5.jpeg"],
+    createdAt: now,
+    updatedAt: now,
     kebudayaans: [
       {
         id: "fallback-sumbar-suku",
@@ -148,6 +202,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/suku/suku5.jpeg"],
         description:
           "Suku matrilineal terbesar yang dikenal dengan falsafah adat basandi syarak.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-sumbar",
       },
       {
         id: "fallback-sumbar-rumah",
@@ -156,6 +214,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/rumah/rumah5.jpeg"],
         description:
           "Rumah adat beratap gonjong yang melambangkan tanduk kerbau.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-sumbar",
       },
       {
         id: "fallback-sumbar-makanan",
@@ -164,6 +226,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/makanan/makanan5.jpg"],
         description:
           "Olahan daging bercita rasa kaya rempah yang dimasak hingga kering.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-sumbar",
       },
     ],
   },
@@ -177,6 +243,8 @@ export const fallbackDaerahData: FallbackDaerah[] = [
     icon: "/icon/bali.png",
     backgroundImg: null,
     images: ["/kesenian/kesenian7.webp", "/rumah/rumah3.jpg"],
+    createdAt: now,
+    updatedAt: now,
     kebudayaans: [
       {
         id: "fallback-jogja-kesenian",
@@ -185,6 +253,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/kesenian/kesenian7.webp"],
         description:
           "Tari sakral keraton yang menggambarkan harmoni antara manusia dan alam.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-jogja",
       },
       {
         id: "fallback-jogja-makanan",
@@ -193,6 +265,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/makanan/makanan3.jpg"],
         description:
           "Masakan nangka muda bercita rasa manis yang disajikan dengan sambal krecek.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-jogja",
       },
       {
         id: "fallback-jogja-rumah",
@@ -201,6 +277,10 @@ export const fallbackDaerahData: FallbackDaerah[] = [
         images: ["/rumah/rumah3.jpg"],
         description:
           "Rumah tradisional dengan atap bergelombang melambangkan strata sosial.",
+        createdAt: now,
+        updatedAt: now,
+        virtualTour: null,
+        daerahId: "fallback-jogja",
       },
     ],
   },
