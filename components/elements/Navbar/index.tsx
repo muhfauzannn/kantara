@@ -148,6 +148,7 @@ const Navbar = () => {
                     : "Cari daerah atau drop gambar..."
                 }
                 value={searchQuery}
+                rightIcon={<Search className="w-5 h-5 text-black" />}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 disabled={isSearching}
               />
@@ -161,14 +162,14 @@ const Navbar = () => {
             >
               <ImageIcon className="w-5 h-5 text-black" />
             </button>
-            <button
+            {/* <button
               type="submit"
               className="p-2 bg-white rounded-md hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isSearching}
               title="Cari"
             >
               <Search className="w-5 h-5 text-black" />
-            </button>
+            </button> */}
           </form>
           <input
             ref={fileInputRef}
