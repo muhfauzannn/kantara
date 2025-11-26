@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { fallbackDaerahData } from "@/lib/data/fallback-daerah";
 
 export async function GET() {
+  if (!prisma) {
+    console.warn("Prisma tidak tersedia, menggunakan data fallback untuk daerah.");
+    return NextResponse.json({
+      success: true,
+      data: fallbackDaerahData,
+      fallback: true,
+    });
+  }
+
   try {
     const daerah = await prisma.daerah.findMany({
       where: {
@@ -34,12 +44,11 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching daerah data:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch daerah data",
-      },
-      { status: 500 }
-    );
+    console.warn("Serving fallback daerah dataset");
+    return NextResponse.json({
+      success: true,
+      data: fallbackDaerahData,
+      fallback: true,
+    });
   }
 }

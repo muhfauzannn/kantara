@@ -1,4 +1,4 @@
-import { Search, Bot } from "lucide-react";
+import { Search, Bot, Compass } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -7,6 +7,11 @@ const Feature = [
     title: "Peta Budaya Interaktif",
     href: "/map",
     icon: <Search className="w-10 h-10" />,
+  },
+  {
+    title: "Virtual Tour Nusantara",
+    href: "/virtual-tour",
+    icon: <Compass className="w-10 h-10" />,
   },
   {
     title: "Chatbot Budaya AI",

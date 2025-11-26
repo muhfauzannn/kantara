@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import DaerahModules from "@/modules/DaerahModules";
 import { prisma } from "@/lib/prisma";
+import { getFallbackDaerahById } from "@/lib/data/fallback-daerah";
 
 type PageProps = {
   params: Promise<{
@@ -11,14 +12,23 @@ type PageProps = {
 };
 
 const getDaerah = cache(async (id: string) => {
-  return prisma.daerah.findUnique({
-    where: { id },
-    include: {
-      kebudayaans: {
-        orderBy: { nama: "asc" },
+  try {
+    if (!prisma) {
+      return getFallbackDaerahById(id);
+    }
+
+    return await prisma.daerah.findUnique({
+      where: { id },
+      include: {
+        kebudayaans: {
+          orderBy: { nama: "asc" },
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Failed to fetch daerah from database, using fallback.", error);
+    return getFallbackDaerahById(id);
+  }
 });
 
 export async function generateMetadata({
