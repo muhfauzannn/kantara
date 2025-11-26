@@ -31,6 +31,7 @@ export default function DaerahPopup({ daerah }: DaerahPopupProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const soundtrackRef = useRef<HTMLAudioElement | null>(null);
   const allImages = daerah.images.length > 0 ? daerah.images : [];
 
   const nextImage = () => {
@@ -57,6 +58,11 @@ export default function DaerahPopup({ daerah }: DaerahPopupProps) {
       if (isPlaying && audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
+        // Stop soundtrack too
+        if (soundtrackRef.current) {
+          soundtrackRef.current.pause();
+          soundtrackRef.current.currentTime = 0;
+        }
         setIsPlaying(false);
         return;
       }
@@ -91,18 +97,35 @@ export default function DaerahPopup({ daerah }: DaerahPopupProps) {
       const audio = new Audio(audioUrl);
       audioRef.current = audio;
 
+      // Setup soundtrack
+      const soundtrack = new Audio("/soundtrack.mp3");
+      soundtrack.loop = true;
+      soundtrack.volume = 0.1; // Set volume to 10% so it doesn't overpower the narration
+      soundtrackRef.current = soundtrack;
+
       audio.onended = () => {
         setIsPlaying(false);
         URL.revokeObjectURL(audioUrl);
+        // Stop soundtrack when narration ends
+        if (soundtrackRef.current) {
+          soundtrackRef.current.pause();
+          soundtrackRef.current.currentTime = 0;
+        }
       };
 
       audio.onerror = () => {
         setIsPlaying(false);
         setIsLoading(false);
+        // Stop soundtrack on error
+        if (soundtrackRef.current) {
+          soundtrackRef.current.pause();
+          soundtrackRef.current.currentTime = 0;
+        }
         alert("Gagal memutar audio");
       };
 
-      await audio.play();
+      // Play both audio and soundtrack
+      await Promise.all([audio.play(), soundtrack.play()]);
       setIsPlaying(true);
       setIsLoading(false);
     } catch (error) {
