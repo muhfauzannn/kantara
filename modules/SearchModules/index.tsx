@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, MapPin, Loader2, Sparkles } from "lucide-react";
+import { Search, Loader2, Sparkles, ImageIcon } from "lucide-react";
 
 interface Kebudayaan {
   id: string;
@@ -24,6 +24,7 @@ interface Daerah {
   images: string[];
   kebudayaans: Kebudayaan[];
   aiExplanation?: string | null;
+  aiConfidence?: string | null;
 }
 
 interface SearchResponse {
@@ -31,6 +32,7 @@ interface SearchResponse {
   data: Daerah[];
   matchedBy: string;
   summary: string;
+  imageDescription?: string;
   error?: string;
 }
 
@@ -38,11 +40,13 @@ const SearchModules = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const query = searchParams.get("q");
+  const imageSearchId = searchParams.get("imageSearch");
 
   const [results, setResults] = useState<Daerah[]>([]);
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState("");
   const [matchedBy, setMatchedBy] = useState("");
+  const [imageDescription, setImageDescription] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -71,12 +75,46 @@ const SearchModules = () => {
       }
     };
 
-    if (query) {
+    const loadImageSearchResults = () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const storedData = sessionStorage.getItem(
+          `image-search-${imageSearchId}`
+        );
+        if (!storedData) {
+          setError("Data pencarian gambar tidak ditemukan");
+          setLoading(false);
+          return;
+        }
+
+        const data: SearchResponse = JSON.parse(storedData);
+
+        if (data.success) {
+          setResults(data.data);
+          setSummary(data.summary);
+          setMatchedBy(data.matchedBy);
+          setImageDescription(data.imageDescription || "");
+        } else {
+          setError(data.error || "Terjadi kesalahan saat mencari");
+        }
+      } catch (err) {
+        setError("Gagal memuat hasil pencarian gambar");
+        console.error("Image search error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (imageSearchId) {
+      loadImageSearchResults();
+    } else if (query) {
       fetchSearchResults(query);
     } else {
       setLoading(false);
     }
-  }, [query, router]);
+  }, [query, imageSearchId, router]);
 
   const getMainImage = (daerah: Daerah): string | null => {
     if (daerah.images && daerah.images.length > 0) {
@@ -88,7 +126,7 @@ const SearchModules = () => {
     return null;
   };
 
-  if (!query) {
+  if (!query && !imageSearchId) {
     return (
       <div className="min-h-screen pt-24 px-12 max-lg:px-10 max-md:px-8 max-sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -108,9 +146,23 @@ const SearchModules = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Hasil Pencarian</h1>
-          <p className="text-gray-600">
-            Pencarian untuk: <span className="font-semibold">{query}</span>
-          </p>
+          {imageSearchId ? (
+            <div className="space-y-2">
+              <p className="text-gray-600 flex items-center gap-2">
+                <ImageIcon className="w-5 h-5" />
+                Pencarian berdasarkan gambar
+              </p>
+              {imageDescription && (
+                <p className="text-sm text-gray-500 italic">
+                  &ldquo;{imageDescription}&rdquo;
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="text-gray-600">
+              Pencarian untuk: <span className="font-semibold">{query}</span>
+            </p>
+          )}
         </div>
 
         {/* Loading State */}
@@ -134,16 +186,19 @@ const SearchModules = () => {
             {/* Summary */}
             <div
               className={`mb-6 p-4 rounded-lg ${
-                matchedBy === "gemini_ai"
+                matchedBy === "gemini_ai" || matchedBy === "gemini_vision"
                   ? "bg-blue-50 border border-blue-200"
                   : "bg-gray-50 border border-gray-200"
               }`}
             >
               <p className="text-sm">
-                {matchedBy === "gemini_ai" && (
+                {(matchedBy === "gemini_ai" ||
+                  matchedBy === "gemini_vision") && (
                   <span className="inline-flex items-center gap-2 text-blue-700 font-semibold mb-1">
-                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                    Berdasarkan pencarian
+                    <Sparkles className="w-4 h-4" />
+                    {matchedBy === "gemini_vision"
+                      ? "Hasil analisis gambar dengan AI"
+                      : "Berdasarkan pencarian AI"}
                   </span>
                 )}
               </p>
@@ -157,10 +212,10 @@ const SearchModules = () => {
                   <Link
                     key={daerah.id}
                     href={`/map?daerah=${daerah.id}`}
-                    className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-red-700"
+                    className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300"
                   >
                     {/* Image */}
-                    <div className="relative h-48 w-full bg-linear-to-br from-red-700 to-red-900">
+                    <div className="relative h-48 rounded-b-lg overflow-hidden w-full bg-linear-to-br from-red-700 to-red-900">
                       {getMainImage(daerah) ? (
                         <Image
                           src={getMainImage(daerah)!}
@@ -184,10 +239,29 @@ const SearchModules = () => {
                       {/* AI Explanation */}
                       {daerah.aiExplanation && (
                         <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-3">
-                          <p className="text-xs text-blue-600 font-semibold mb-1 flex items-center gap-1">
-                            <Sparkles className="w-3 h-3" />
-                            Mengapa cocok?
-                          </p>
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-xs text-blue-600 font-semibold flex items-center gap-1">
+                              <Sparkles className="w-3 h-3" />
+                              Mengapa cocok?
+                            </p>
+                            {daerah.aiConfidence && (
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-full ${
+                                  daerah.aiConfidence === "high"
+                                    ? "bg-green-100 text-green-700"
+                                    : daerah.aiConfidence === "medium"
+                                    ? "bg-yellow-100 text-yellow-700"
+                                    : "bg-orange-100 text-orange-700"
+                                }`}
+                              >
+                                {daerah.aiConfidence === "high"
+                                  ? "Sangat Cocok"
+                                  : daerah.aiConfidence === "medium"
+                                  ? "Cukup Cocok"
+                                  : "Mungkin Cocok"}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-sm text-blue-800">
                             {daerah.aiExplanation}
                           </p>

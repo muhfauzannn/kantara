@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,9 @@ interface DaerahPopupProps {
 
 export default function DaerahPopup({ daerah }: DaerahPopupProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const allImages = daerah.images.length > 0 ? daerah.images : [];
 
   const nextImage = () => {
@@ -44,14 +47,85 @@ export default function DaerahPopup({ daerah }: DaerahPopupProps) {
     }
   };
 
+  const handleAIAssistant = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Stop event propagation to prevent popup from closing
+    e.stopPropagation();
+    e.preventDefault();
+
+    try {
+      // If audio is already playing, stop it
+      if (isPlaying && audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        setIsPlaying(false);
+        return;
+      }
+
+      setIsLoading(true);
+
+      // Call the TTS API with daerah information
+      const response = await fetch("/api/tts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: daerah.description,
+          daerahNama: daerah.nama,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate speech");
+      }
+
+      // Convert response to blob
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      // Create and play audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = () => {
+        setIsPlaying(false);
+        setIsLoading(false);
+        alert("Gagal memutar audio");
+      };
+
+      await audio.play();
+      setIsPlaying(true);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error playing audio:", error);
+      setIsLoading(false);
+      alert("Terjadi kesalahan saat memutar audio");
+    }
+  };
+
   return (
     <div className="w-80 max-w-sm">
       {/* Header */}
       <div className="mb-3">
-        <h3 className="font-bold text-lg text-gray-800 mb-1">{daerah.nama}</h3>
-        <p className="text-sm text-gray-600 leading-relaxed">
-          {daerah.description}
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1">
+            <h3 className="font-bold text-lg text-gray-800 mb-1">
+              {daerah.nama}
+            </h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              {daerah.description}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Image Gallery */}
@@ -122,11 +196,56 @@ export default function DaerahPopup({ daerah }: DaerahPopupProps) {
           </div>
         </div>
       )}
-      <Link href={`/daerah/${daerah.id}`}>
-        <Button className="w-full cursor-pointer" variant={"ghost"}>
-          Lihat Selengkapnya
-        </Button>
-      </Link>
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={handleAIAssistant}
+          disabled={isLoading}
+          className={`shrink-0 flex justify-center py-2.5 rounded-lg w-full transition-all ${
+            isPlaying
+              ? "bg-red-500 hover:bg-red-600"
+              : "bg-red-500 hover:bg-red-600"
+          } text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed`}
+          title={
+            isPlaying
+              ? "Stop AI Assistant"
+              : "Dengarkan penjelasan dari AI Assistant"
+          }
+        >
+          {isLoading ? (
+            <svg
+              className="w-5 h-5 animate-spin"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+          ) : isPlaying ? (
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <rect x="6" y="4" width="4" height="16" />
+              <rect x="14" y="4" width="4" height="16" />
+            </svg>
+          ) : (
+            <div className="text-base">Kata AI</div>
+          )}
+        </button>
+        <Link href={`/daerah/${daerah.id}`}>
+          <Button className="w-full cursor-pointer" variant={"ghost"}>
+            Lihat Selengkapnya
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }
