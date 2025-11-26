@@ -237,9 +237,9 @@ const SearchModules = () => {
 
                       {/* AI Explanation */}
                       {daerah.aiExplanation && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-3">
+                        <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-3">
                           <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs text-blue-600 font-semibold flex items-center gap-1">
+                            <p className="text-xs text-red-600 font-semibold flex items-center gap-1">
                               <Sparkles className="w-3 h-3" />
                               Mengapa cocok?
                             </p>
@@ -261,7 +261,7 @@ const SearchModules = () => {
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-blue-800">
+                          <p className="text-sm text-brown-500">
                             {daerah.aiExplanation}
                           </p>
                         </div>
