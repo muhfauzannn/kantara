@@ -187,15 +187,14 @@ const SearchModules = () => {
             <div
               className={`mb-6 p-4 rounded-lg ${
                 matchedBy === "gemini_ai" || matchedBy === "gemini_vision"
-                  ? "bg-blue-50 border border-blue-200"
+                  ? "bg-red-50 border border-red-200"
                   : "bg-gray-50 border border-gray-200"
               }`}
             >
               <p className="text-sm">
                 {(matchedBy === "gemini_ai" ||
                   matchedBy === "gemini_vision") && (
-                  <span className="inline-flex items-center gap-2 text-blue-700 font-semibold mb-1">
-                    <Sparkles className="w-4 h-4" />
+                  <span className="inline-flex items-center gap-2 text-red-700 font-semibold mb-1">
                     {matchedBy === "gemini_vision"
                       ? "Hasil analisis gambar dengan AI"
                       : "Berdasarkan pencarian AI"}
