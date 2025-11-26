@@ -27,8 +27,8 @@ interface DaerahData {
 const customIcon = new Icon({
   iconUrl: "/icon/bali.png",
   iconRetinaUrl: "/icon/bali@2x.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+  iconSize: [28, 28],
+  iconAnchor: [12, 21],
   popupAnchor: [1, -34],
 });
 
