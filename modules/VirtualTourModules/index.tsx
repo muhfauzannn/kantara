@@ -25,6 +25,44 @@ type VirtualTour = {
   themes: string[];
 };
 
+// Helper function to get random image from a folder
+const getRandomImage = (folder: string, count: number): string => {
+  const randomNum = Math.floor(Math.random() * count) + 1;
+  return `/${folder}/${folder}${randomNum}.jpg`;
+};
+
+// Image pools
+const IMAGE_POOLS = {
+  kesenian: 38,
+  rumah: 38,
+  makanan: 38,
+  suku: 38,
+};
+
+// Function to randomly assign images to tours
+const randomizeImages = (tours: VirtualTour[]): VirtualTour[] => {
+  const folders = Object.keys(IMAGE_POOLS) as Array<keyof typeof IMAGE_POOLS>;
+
+  return tours.map((tour) => {
+    const randomFolder = folders[Math.floor(Math.random() * folders.length)];
+    const heroImage = getRandomImage(randomFolder, IMAGE_POOLS[randomFolder]);
+
+    const stopsWithImages = tour.stops.map((stop) => {
+      const stopFolder = folders[Math.floor(Math.random() * folders.length)];
+      return {
+        ...stop,
+        image: getRandomImage(stopFolder, IMAGE_POOLS[stopFolder]),
+      };
+    });
+
+    return {
+      ...tour,
+      heroImage,
+      stops: stopsWithImages,
+    };
+  });
+};
+
 const tours: VirtualTour[] = [
   {
     id: "jakarta-gedung-kesenian",
@@ -32,7 +70,7 @@ const tours: VirtualTour[] = [
     location: "DKI Jakarta",
     description:
       "Tur 360° di Gedung Kesenian Jakarta, menelusuri auditorium bersejarah dan detail arsitektur kolonial.",
-    heroImage: "/kesenian/kesenian1.jpg",
+    heroImage: "/kesenian/tari1.jpg",
     embedUrl:
       "https://indonesiavirtualtour.com/storage/destination/gedung-kesenian-jakarta/src/index.htm",
     canEmbed: true,
@@ -46,7 +84,7 @@ const tours: VirtualTour[] = [
         title: "Area Utama",
         description:
           "Fokus pada area auditorium utama dan panggung pertunjukan.",
-        image: "/kesenian/kesenian1.jpg",
+        image: "/kesenian/tari2.jpg",
       },
     ],
   },
@@ -70,7 +108,7 @@ const tours: VirtualTour[] = [
         title: "Ruang Pamer Utama",
         description:
           "Menelusuri ruang pamer berisi koleksi wayang dan penjelasan singkatnya.",
-        image: "/kesenian/kesenian2.jpeg",
+        image: "/kesenian/tari5.jpg",
       },
     ],
   },
@@ -94,7 +132,7 @@ const tours: VirtualTour[] = [
         title: "Area Taman",
         description:
           "Berjalan menyusuri area taman dan kanal yang merefleksikan masa kejayaan Sriwijaya.",
-        image: "/kesenian/kesenian3.webp",
+        image: "/kesenian/tari6.jpg",
       },
     ],
   },
@@ -118,7 +156,7 @@ const tours: VirtualTour[] = [
         title: "Ruang Koleksi Utama",
         description:
           "Melihat koleksi utama yang menceritakan sejarah Palembang dan Sultan Mahmud Badaruddin II.",
-        image: "/kesenian/kesenian4.jpg",
+        image: "/kesenian/tari7.jpg",
       },
     ],
   },
@@ -166,7 +204,7 @@ const tours: VirtualTour[] = [
         title: "Teras Candi",
         description:
           "Berjalan di teras candi sambil mengamati relief dan pemandangan sekitar.",
-        image: "/kesenian/kesenian1.jpg",
+        image: "/kesenian/tari9.jpg",
       },
     ],
   },
@@ -238,7 +276,7 @@ const tours: VirtualTour[] = [
         title: "Area Situs",
         description:
           "Berjalan di sekitar situs utama yang menyimpan jejak peninggalan Majapahit.",
-        image: "/kesenian/kesenian3.webp",
+        image: "/rumah/rumah4.jpg",
       },
     ],
   },
@@ -248,7 +286,7 @@ const tours: VirtualTour[] = [
     location: "Jawa Timur",
     description:
       "Mengunjungi Hunian Prasejarah Pacitan secara virtual, mengenal jejak awal manusia di kawasan ini.",
-    heroImage: "/kesenian/kesenian4.jpg",
+    heroImage: "/kesenian/tari8.jpg",
     embedUrl:
       "https://indonesiavirtualtour.com/storage/destination/hunian-prasejarah-pacitan/src/index.htm",
     canEmbed: true,
@@ -272,7 +310,7 @@ const tours: VirtualTour[] = [
     location: "Sumatera Barat",
     description:
       "Tur 360° yang memperkenalkan kawasan Dharmasraya dan jejak sejarah di sekitarnya.",
-    heroImage: "/kesenian/kesenian5.jpeg",
+    heroImage: "/kesenian/tari8.jpeg",
     embedUrl:
       "https://indonesiavirtualtour.com/storage/destination/dharmasraya/src/index.htm",
     canEmbed: true,
@@ -286,7 +324,7 @@ const tours: VirtualTour[] = [
         title: "Area Utama",
         description:
           "Mengamati kawasan utama yang menjadi fokus dokumentasi Dharmasraya.",
-        image: "/kesenian/kesenian5.jpeg",
+        image: "/kesenian/tari8.jpeg",
       },
     ],
   },
@@ -332,8 +370,7 @@ const tours: VirtualTour[] = [
     stops: [
       {
         title: "Kompleks Candi Utama",
-        description:
-          "Mengamati candi-candi utama dari berbagai sudut pandang.",
+        description: "Mengamati candi-candi utama dari berbagai sudut pandang.",
         image: "/kesenian/kesenian7.webp",
       },
     ],
@@ -533,7 +570,9 @@ const tours: VirtualTour[] = [
 ];
 
 const VirtualTourModules = () => {
-  const [selectedTourId, setSelectedTourId] = useState(tours[0]?.id);
+  // Initialize randomized tours on mount
+  const [randomizedTours] = useState(() => randomizeImages(tours));
+  const [selectedTourId, setSelectedTourId] = useState(randomizedTours[0]?.id);
   const [fullscreenTour, setFullscreenTour] = useState<VirtualTour | null>(
     null
   );
@@ -545,26 +584,26 @@ const VirtualTourModules = () => {
   const [chatMessages, setChatMessages] = useState<string[]>([]);
 
   const stats = useMemo(() => {
-    const regions = new Set(tours.map((tour) => tour.location));
+    const regions = new Set(randomizedTours.map((tour) => tour.location));
     return {
-      totalTours: tours.length,
+      totalTours: randomizedTours.length,
       totalRegions: regions.size,
     };
-  }, []);
+  }, [randomizedTours]);
 
   const themedHighlights = useMemo(() => {
-    const allThemes = tours.flatMap((tour) => tour.themes || []);
+    const allThemes = randomizedTours.flatMap((tour) => tour.themes || []);
     return Array.from(new Set(allThemes));
-  }, []);
+  }, [randomizedTours]);
 
   const filteredTours = useMemo(() => {
-    if (!activeTheme) return tours;
-    return tours.filter((tour) => tour.themes?.includes(activeTheme));
-  }, [activeTheme]);
+    if (!activeTheme) return randomizedTours;
+    return randomizedTours.filter((tour) => tour.themes?.includes(activeTheme));
+  }, [activeTheme, randomizedTours]);
 
-  const toursForList = activeTheme ? filteredTours : tours;
+  const toursForList = activeTheme ? filteredTours : randomizedTours;
   const showNoThemeMatches = Boolean(activeTheme) && toursForList.length === 0;
-  const activeCollection = toursForList.length ? toursForList : tours;
+  const activeCollection = toursForList.length ? toursForList : randomizedTours;
 
   useEffect(() => {
     if (!toursForList.length) return;
@@ -666,338 +705,342 @@ ${
   return (
     <>
       <section className="bg-gradient-to-b from-red-50 via-white to-yellow-50 min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
-        <header className="text-center max-w-3xl mx-auto mb-12">
-          <p className="text-sm uppercase tracking-widest text-red-500">
-            Virtual Tour
-          </p>
-          <h1 className="text-4xl font-semibold mt-2 mb-4 text-gray-900">
-            Jelajah Nusantara secara Imersif
-          </h1>
-          <p className="text-gray-600">
-            Pilih salah satu rute dan nikmati pengalaman tur 360° lengkap
-            dengan narasi budaya, highlight visual, dan tips singkat sebelum
-            Anda benar benar berkunjung.
-          </p>
-        </header>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
+          <header className="text-center max-w-3xl mx-auto mb-12">
+            <p className="text-sm uppercase tracking-widest text-red-500">
+              Virtual Tour
+            </p>
+            <h1 className="text-4xl font-semibold mt-2 mb-4 text-gray-900">
+              Jelajah Nusantara secara Imersif
+            </h1>
+            <p className="text-gray-600">
+              Pilih salah satu rute dan nikmati pengalaman tur 360° lengkap
+              dengan narasi budaya, highlight visual, dan tips singkat sebelum
+              Anda benar benar berkunjung.
+            </p>
+          </header>
 
-        <div className="mb-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-3xl border border-red-100 bg-gradient-to-br from-red-50 to-white p-6 shadow-sm">
-            <p className="text-sm uppercase tracking-[0.3em] text-red-600">
-              Kurasi
-            </p>
-            <p className="mt-2 text-4xl font-semibold text-gray-900">
-              {stats.totalTours}
-              <span className="text-base font-medium text-gray-500 ml-2">
-                tur interaktif
-              </span>
-            </p>
-            <p className="mt-2 text-sm text-gray-600">
-              Koleksi tur budaya yang bisa Anda jalani langsung dari layar
-              perangkat.
-            </p>
-          </div>
-          <div className="rounded-3xl border border-red-100 bg-gradient-to-br from-red-50 to-white p-6 shadow-sm">
-            <p className="text-sm uppercase tracking-[0.3em] text-red-600">
-              Sebaran Daerah
-            </p>
-            <p className="mt-2 text-4xl font-semibold text-gray-900">
-              {stats.totalRegions}
-              <span className="text-base font-medium text-gray-500 ml-2">
-                lokasi
-              </span>
-            </p>
-            <p className="mt-2 text-sm text-gray-600">
-              Dari ibukota hingga kawasan bersejarah di luar Jawa.
-            </p>
-          </div>
-          <div className="rounded-3xl border border-red-200 bg-gradient-to-br from-red-600 to-red-500 text-white p-6 shadow-lg">
-            <p className="text-sm uppercase tracking-[0.3em] text-white/80">
-              Tema Tur
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {themedHighlights.map((theme) => {
-                const isActive = activeTheme === theme;
-                return (
-                  <button
-                    key={theme}
-                    onClick={() =>
-                      setActiveTheme((prev) => (prev === theme ? null : theme))
-                    }
-                    className={`rounded-full px-3 py-1 text-sm transition ${
-                      isActive
-                        ? "bg-white/90 text-gray-900"
-                        : "bg-white/10 text-white hover:bg-white/20"
-                    }`}
-                  >
-                    {theme}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="mt-3 text-sm text-gray-200">
-              Pilih tur favorit Anda dan mulai jelajah.
-            </p>
-            {activeTheme && (
-              <button
-                onClick={() => setActiveTheme(null)}
-                className="mt-3 text-xs uppercase tracking-[0.3em] text-gray-400 hover:text-white transition"
-              >
-                Reset tema
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="grid gap-8 lg:grid-cols-[320px_1fr]">
-          <aside className="bg-white/80 backdrop-blur rounded-3xl shadow-lg p-4 h-fit">
-            <p className="text-sm font-semibold text-gray-500 mb-4">
-              Pilih destinasi
-            </p>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-3 max-h-[420px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-                {showNoThemeMatches ? (
-                  <div className="rounded-2xl border border-dashed border-gray-200 bg-white/80 p-4 text-sm text-gray-600">
-                    Belum ada tur dengan tema <strong>{activeTheme}</strong>.
-                    Silakan pilih tema lain.
-                  </div>
-                ) : (
-                  toursForList.map((tour) => {
-                    const isActive = tour.id === activeTour.id;
-                    return (
-                      <button
-                        key={tour.id}
-                        onClick={() => setSelectedTourId(tour.id)}
-                        className={`text-left rounded-2xl border transition-all p-4 ${
-                          isActive
-                            ? "border-red-500 bg-gradient-to-br from-red-500/10 to-white shadow-md"
-                            : "border-gray-200 hover:border-red-300"
-                        }`}
-                      >
-                        <p className="text-[11px] uppercase tracking-[0.3em] text-gray-500">
-                          {tour.location}
-                        </p>
-                        <p className="font-semibold text-gray-900">
-                          {tour.title}
-                        </p>
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-            </div>
-            <div className="mt-6 space-y-2 text-sm text-gray-600">
-              <p className="font-semibold text-gray-900">
-                Tips menikmati virtual tour:
+          <div className="mb-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-3xl border border-red-100 bg-gradient-to-br from-red-50 to-white p-6 shadow-sm">
+              <p className="text-sm uppercase tracking-[0.3em] text-red-600">
+                Kurasi
               </p>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>Gunakan headphone untuk efek audio 3D.</li>
-                <li>Perbesar tampilan video dan aktifkan resolusi 4K.</li>
-                <li>
-                  Catat spot favorit lalu tandai di{" "}
-                  <Link href="/map" className="text-red-600 underline">
-                    peta interaktif
-                  </Link>
-                  .
-                </li>
-              </ul>
+              <p className="mt-2 text-4xl font-semibold text-gray-900">
+                {stats.totalTours}
+                <span className="text-base font-medium text-gray-500 ml-2">
+                  tur interaktif
+                </span>
+              </p>
+              <p className="mt-2 text-sm text-gray-600">
+                Koleksi tur budaya yang bisa Anda jalani langsung dari layar
+                perangkat.
+              </p>
             </div>
-          </aside>
-
-        <div className="space-y-8">
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-              <div className="relative h-72 sm:h-96">
-                <Image
-                  src={activeTour.heroImage}
-                  alt={activeTour.title}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
-                  <div className="flex items-center gap-2 text-sm uppercase tracking-[0.3em] text-white/80">
-                    <MapPin className="w-4 h-4" />
-                    {activeTour.location}
-                  </div>
-                  <h2 className="text-3xl font-semibold">{activeTour.title}</h2>
-                  <p className="text-white/90">{activeTour.description}</p>
-                </div>
-              </div>
-
-              <div className="p-6 space-y-6">
-                <div className="flex flex-wrap gap-3">
-                  {activeTour.highlights.map((highlight) => (
-                    <span
-                      key={highlight}
-                      className="px-3 py-1.5 bg-red-50 text-red-700 rounded-full text-sm"
-                    >
-                      {highlight}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <Button asChild>
-                    <a href="#virtual-tour-viewer">Mulai Tur Virtual</a>
-                  </Button>
-                </div>
-              </div>
+            <div className="rounded-3xl border border-red-100 bg-gradient-to-br from-red-50 to-white p-6 shadow-sm">
+              <p className="text-sm uppercase tracking-[0.3em] text-red-600">
+                Sebaran Daerah
+              </p>
+              <p className="mt-2 text-4xl font-semibold text-gray-900">
+                {stats.totalRegions}
+                <span className="text-base font-medium text-gray-500 ml-2">
+                  lokasi
+                </span>
+              </p>
+              <p className="mt-2 text-sm text-gray-600">
+                Dari ibukota hingga kawasan bersejarah di luar Jawa.
+              </p>
             </div>
-
-            <div
-              id="virtual-tour-viewer"
-              className="bg-white rounded-3xl shadow-xl p-6"
-            >
-              {activeTour.canEmbed !== false ? (
-                <>
-                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-gray-500">
-                        Virtual Tour 360°
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Gunakan cursor atau sentuhan untuk berkeliling, lalu
-                        klik tombol di samping untuk tampilan layar penuh.
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openFullscreen(activeTour)}
-                    >
-                      Perbesar
-                    </Button>
-                  </div>
-                  <div className="aspect-video rounded-2xl overflow-hidden shadow-lg">
-                    <iframe
-                      src={activeTour.embedUrl}
-                      title={activeTour.title}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-                    <p className="text-sm font-semibold text-gray-500">
-                      Virtual tour eksternal
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
+            <div className="rounded-3xl border border-red-200 bg-gradient-to-br from-red-600 to-red-500 text-white p-6 shadow-lg">
+              <p className="text-sm uppercase tracking-[0.3em] text-white/80">
+                Tema Tur
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {themedHighlights.map((theme) => {
+                  const isActive = activeTheme === theme;
+                  return (
+                    <button
+                      key={theme}
                       onClick={() =>
-                        window.open(
-                          activeTour.embedUrl,
-                          "_blank",
-                          "noopener,noreferrer"
+                        setActiveTheme((prev) =>
+                          prev === theme ? null : theme
                         )
                       }
+                      className={`rounded-full px-3 py-1 text-sm transition ${
+                        isActive
+                          ? "bg-white/90 text-gray-900"
+                          : "bg-white/10 text-white hover:bg-white/20"
+                      }`}
                     >
-                      Kunjungi Tur
-                    </Button>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Tur ini dibuka di situs resmi penyedia dan tidak dapat
-                    ditampilkan langsung di dalam aplikasi karena pengaturan
-                    keamanan situs tersebut.
-                  </p>
-                </>
-              )}
-              <p className="text-xs text-gray-400 mt-4">
-                Virtual tour dihadirkan melalui Indonesia Virtual Tour
+                      {theme}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-3 text-sm text-gray-200">
+                Pilih tur favorit Anda dan mulai jelajah.
               </p>
-            </div>
-
-            <div className="bg-white rounded-3xl shadow-xl p-6 space-y-6">
-              <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-red-500">
-                  Narasi AI
-                </p>
-                <h3 className="text-lg font-semibold text-gray-900 mt-1">
-                  Dengarkan cerita tentang {activeTour.title}
-                </h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  Sistem akan merangkai deskripsi singkat seperti saat Anda
-                  menekan tombol audio di peta. Cocok untuk mengenal destinasi
-                  sebelum mulai tur.
-                </p>
-              </div>
-              <button
-                onClick={handleNarration}
-                disabled={isNarrationLoading}
-                className="w-full rounded-2xl bg-red-500 text-white py-3 font-semibold shadow-lg hover:bg-red-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {isNarrationLoading
-                  ? "Menyiapkan narasi..."
-                  : isNarrationPlaying
-                  ? "Hentikan Audio"
-                  : "Putar Narasi AI"}
-              </button>
-              <p className="text-xs text-gray-500 text-center">
-                Suara: ElevenLabs · Konten: Gemini 2.0 · Bahasa: Indonesia
-              </p>
-            </div>
-            <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
-              <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-red-500">
-                  Chat Lokasi
-                </p>
-                <h3 className="text-lg font-semibold text-gray-900 mt-1">
-                  Beri tahu AI Anda berada di mana
-                </h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  Pesan terakhir akan dipakai sebagai konteks sebelum narasi
-                  diputar, sehingga penjelasan lebih relevan dengan bagian yang
-                  sedang Anda lihat.
-                </p>
-              </div>
-              <div className="h-32 rounded-2xl border border-dashed border-gray-200 p-3 overflow-y-auto text-sm text-gray-700 space-y-2">
-                {chatMessages.length === 0 ? (
-                  <p className="text-gray-500">
-                    Belum ada chat. Ceritakan ke AI bagian budaya yang sedang
-                    Anda jelajahi (contoh: “Saya lagi lihat panggung utama
-                    Gedung Kesenian”).
-                  </p>
-                ) : (
-                  chatMessages.map((msg, idx) => (
-                    <div key={`${msg}-${idx}`}>
-                      <p className="text-[11px] uppercase tracking-[0.3em] text-gray-400">
-                        Anda
-                      </p>
-                      <p>{msg}</p>
-                    </div>
-                  ))
-                )}
-              </div>
-              <form onSubmit={handleChatSubmit} className="space-y-2">
-                <textarea
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Tuliskan lokasi/spot yang sedang Anda lihat..."
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
-                  rows={2}
-                />
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={!chatInput.trim()}
+              {activeTheme && (
+                <button
+                  onClick={() => setActiveTheme(null)}
+                  className="mt-3 text-xs uppercase tracking-[0.3em] text-gray-400 hover:text-white transition"
                 >
-                  Kirim Chat Lokasi
-                </Button>
-              </form>
-              {chatMessages.length > 0 && (
-                <p className="text-[11px] text-gray-400 text-center">
-                  Narasi berikutnya akan menyertakan konteks ini.
-                </p>
+                  Reset tema
+                </button>
               )}
             </div>
           </div>
+
+          <div className="grid gap-8 lg:grid-cols-[320px_1fr]">
+            <aside className="bg-white/80 backdrop-blur rounded-3xl shadow-lg p-4 h-fit">
+              <p className="text-sm font-semibold text-gray-500 mb-4">
+                Pilih destinasi
+              </p>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-3 max-h-[420px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                  {showNoThemeMatches ? (
+                    <div className="rounded-2xl border border-dashed border-gray-200 bg-white/80 p-4 text-sm text-gray-600">
+                      Belum ada tur dengan tema <strong>{activeTheme}</strong>.
+                      Silakan pilih tema lain.
+                    </div>
+                  ) : (
+                    toursForList.map((tour) => {
+                      const isActive = tour.id === activeTour.id;
+                      return (
+                        <button
+                          key={tour.id}
+                          onClick={() => setSelectedTourId(tour.id)}
+                          className={`text-left rounded-2xl border transition-all p-4 ${
+                            isActive
+                              ? "border-red-500 bg-gradient-to-br from-red-500/10 to-white shadow-md"
+                              : "border-gray-200 hover:border-red-300"
+                          }`}
+                        >
+                          <p className="text-[11px] uppercase tracking-[0.3em] text-gray-500">
+                            {tour.location}
+                          </p>
+                          <p className="font-semibold text-gray-900">
+                            {tour.title}
+                          </p>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+              <div className="mt-6 space-y-2 text-sm text-gray-600">
+                <p className="font-semibold text-gray-900">
+                  Tips menikmati virtual tour:
+                </p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Gunakan headphone untuk efek audio 3D.</li>
+                  <li>Perbesar tampilan video dan aktifkan resolusi 4K.</li>
+                  <li>
+                    Catat spot favorit lalu tandai di{" "}
+                    <Link href="/map" className="text-red-600 underline">
+                      peta interaktif
+                    </Link>
+                    .
+                  </li>
+                </ul>
+              </div>
+            </aside>
+
+            <div className="space-y-8">
+              <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+                <div className="relative h-72 sm:h-96">
+                  <Image
+                    src={activeTour.heroImage}
+                    alt={activeTour.title}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
+                    <div className="flex items-center gap-2 text-sm uppercase tracking-[0.3em] text-white/80">
+                      <MapPin className="w-4 h-4" />
+                      {activeTour.location}
+                    </div>
+                    <h2 className="text-3xl font-semibold">
+                      {activeTour.title}
+                    </h2>
+                    <p className="text-white/90">{activeTour.description}</p>
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-6">
+                  <div className="flex flex-wrap gap-3">
+                    {activeTour.highlights.map((highlight) => (
+                      <span
+                        key={highlight}
+                        className="px-3 py-1.5 bg-red-50 text-red-700 rounded-full text-sm"
+                      >
+                        {highlight}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    <Button asChild>
+                      <a href="#virtual-tour-viewer">Mulai Tur Virtual</a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                id="virtual-tour-viewer"
+                className="bg-white rounded-3xl shadow-xl p-6"
+              >
+                {activeTour.canEmbed !== false ? (
+                  <>
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-500">
+                          Virtual Tour 360°
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Gunakan cursor atau sentuhan untuk berkeliling, lalu
+                          klik tombol di samping untuk tampilan layar penuh.
+                        </p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openFullscreen(activeTour)}
+                      >
+                        Perbesar
+                      </Button>
+                    </div>
+                    <div className="aspect-video rounded-2xl overflow-hidden shadow-lg">
+                      <iframe
+                        src={activeTour.embedUrl}
+                        title={activeTour.title}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                      <p className="text-sm font-semibold text-gray-500">
+                        Virtual tour eksternal
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          window.open(
+                            activeTour.embedUrl,
+                            "_blank",
+                            "noopener,noreferrer"
+                          )
+                        }
+                      >
+                        Kunjungi Tur
+                      </Button>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Tur ini dibuka di situs resmi penyedia dan tidak dapat
+                      ditampilkan langsung di dalam aplikasi karena pengaturan
+                      keamanan situs tersebut.
+                    </p>
+                  </>
+                )}
+                <p className="text-xs text-gray-400 mt-4">
+                  Virtual tour dihadirkan melalui Indonesia Virtual Tour
+                </p>
+              </div>
+
+              <div className="bg-white rounded-3xl shadow-xl p-6 space-y-6">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.3em] text-red-500">
+                    Narasi AI
+                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900 mt-1">
+                    Dengarkan cerita tentang {activeTour.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Sistem akan merangkai deskripsi singkat seperti saat Anda
+                    menekan tombol audio di peta. Cocok untuk mengenal destinasi
+                    sebelum mulai tur.
+                  </p>
+                </div>
+                <button
+                  onClick={handleNarration}
+                  disabled={isNarrationLoading}
+                  className="w-full rounded-2xl bg-red-500 text-white py-3 font-semibold shadow-lg hover:bg-red-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isNarrationLoading
+                    ? "Menyiapkan narasi..."
+                    : isNarrationPlaying
+                    ? "Hentikan Audio"
+                    : "Putar Narasi AI"}
+                </button>
+                <p className="text-xs text-gray-500 text-center">
+                  Suara: ElevenLabs · Konten: Gemini 2.0 · Bahasa: Indonesia
+                </p>
+              </div>
+              <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.3em] text-red-500">
+                    Chat Lokasi
+                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900 mt-1">
+                    Beri tahu AI Anda berada di mana
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Pesan terakhir akan dipakai sebagai konteks sebelum narasi
+                    diputar, sehingga penjelasan lebih relevan dengan bagian
+                    yang sedang Anda lihat.
+                  </p>
+                </div>
+                <div className="h-32 rounded-2xl border border-dashed border-gray-200 p-3 overflow-y-auto text-sm text-gray-700 space-y-2">
+                  {chatMessages.length === 0 ? (
+                    <p className="text-gray-500">
+                      Belum ada chat. Ceritakan ke AI bagian budaya yang sedang
+                      Anda jelajahi (contoh: “Saya lagi lihat panggung utama
+                      Gedung Kesenian”).
+                    </p>
+                  ) : (
+                    chatMessages.map((msg, idx) => (
+                      <div key={`${msg}-${idx}`}>
+                        <p className="text-[11px] uppercase tracking-[0.3em] text-gray-400">
+                          Anda
+                        </p>
+                        <p>{msg}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+                <form onSubmit={handleChatSubmit} className="space-y-2">
+                  <textarea
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Tuliskan lokasi/spot yang sedang Anda lihat..."
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
+                    rows={2}
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={!chatInput.trim()}
+                  >
+                    Kirim Chat Lokasi
+                  </Button>
+                </form>
+                {chatMessages.length > 0 && (
+                  <p className="text-[11px] text-gray-400 text-center">
+                    Narasi berikutnya akan menyertakan konteks ini.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
       {fullscreenTour && (
         <div className="fixed inset-0 z-[2000] bg-black/80 backdrop-blur-sm flex flex-col">
           <div className="flex items-center justify-between px-6 py-4 text-white border-b border-white/10">
