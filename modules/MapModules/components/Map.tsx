@@ -3,7 +3,7 @@
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import DaerahMarker from "./DaerahMarker";
 
 interface DaerahData {
@@ -32,10 +32,19 @@ const customIcon = new Icon({
   popupAnchor: [1, -34],
 });
 
-const Map = () => {
+interface MapProps {
+  selectedDaerahId?: string | null;
+}
+
+const Map = ({ selectedDaerahId }: MapProps) => {
   const [daerahData, setDaerahData] = useState<DaerahData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mapCenter, setMapCenter] = useState<[number, number]>([
+    -2.5489, 118.0149,
+  ]);
+  const [mapZoom, setMapZoom] = useState(5);
+  const markerRefs = useRef<{ [key: string]: any }>({});
 
   useEffect(() => {
     // Fix untuk Leaflet di Next.js
@@ -51,6 +60,23 @@ const Map = () => {
     // Fetch daerah data
     fetchDaerahData();
   }, []);
+
+  // Open popup and zoom to selected daerah when selectedDaerahId changes
+  useEffect(() => {
+    if (selectedDaerahId && daerahData.length > 0) {
+      const selectedDaerah = daerahData.find((d) => d.id === selectedDaerahId);
+      if (selectedDaerah) {
+        // Update map center and zoom to selected daerah
+        setMapCenter([selectedDaerah.latitude, selectedDaerah.longitude]);
+        setMapZoom(10);
+
+        // Wait a bit for map to be ready and open popup
+        setTimeout(() => {
+          markerRefs.current[selectedDaerahId]?.openPopup();
+        }, 500);
+      }
+    }
+  }, [selectedDaerahId, daerahData]);
 
   const fetchDaerahData = async () => {
     try {
@@ -100,8 +126,8 @@ const Map = () => {
 
   return (
     <MapContainer
-      center={[-2.5489, 118.0149]} // Koordinat tengah Indonesia
-      zoom={5}
+      center={mapCenter}
+      zoom={mapZoom}
       style={{ height: "100%", width: "100%" }}
       className="z-0"
     >
@@ -112,7 +138,16 @@ const Map = () => {
 
       {/* Dynamic markers from database */}
       {daerahData.map((daerah) => (
-        <DaerahMarker key={daerah.id} daerah={daerah} icon={customIcon} />
+        <DaerahMarker
+          key={daerah.id}
+          daerah={daerah}
+          icon={customIcon}
+          ref={(el) => {
+            if (el) {
+              markerRefs.current[daerah.id] = el;
+            }
+          }}
+        />
       ))}
     </MapContainer>
   );

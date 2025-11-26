@@ -2,15 +2,26 @@
 
 import { navbarItems } from "./const";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Input } from "../../ui/input";
 import { Search, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setIsMenuOpen(false);
+    }
   };
 
   return (
@@ -35,13 +46,19 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Search */}
-        <div className="hidden md:block">
+        <form onSubmit={handleSearch} className="hidden md:block">
           <Input
             className="w-50 bg-white text-black placeholder:text-black/50"
-            placeholder="Cari..."
-            rightIcon={<Search className="w-5 h-5 text-black" />}
+            placeholder="Cari daerah..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            rightIcon={
+              <button type="submit" className="cursor-pointer">
+                <Search className="w-5 h-5 text-black" />
+              </button>
+            }
           />
-        </div>
+        </form>
 
         {/* Mobile Hamburger Button */}
         <button
@@ -74,13 +91,19 @@ const Navbar = () => {
             ))}
 
             {/* Mobile Search */}
-            <div className="w-80 max-w-[80vw]">
+            <form onSubmit={handleSearch} className="w-80 max-w-[80vw]">
               <Input
                 className="w-full bg-white text-black placeholder:text-black/50"
-                placeholder="Cari..."
-                rightIcon={<Search className="w-5 h-5 text-black" />}
+                placeholder="Cari daerah..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                rightIcon={
+                  <button type="submit" className="cursor-pointer">
+                    <Search className="w-5 h-5 text-black" />
+                  </button>
+                }
               />
-            </div>
+            </form>
           </div>
         </div>
       )}

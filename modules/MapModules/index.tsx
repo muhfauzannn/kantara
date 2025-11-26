@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 
 // Import Map component dengan dynamic untuk menghindari SSR issues
 const Map = dynamic(() => import("./components/Map"), {
@@ -16,9 +17,12 @@ const Map = dynamic(() => import("./components/Map"), {
 });
 
 const MapModules = () => {
+  const searchParams = useSearchParams();
+  const daerahId = searchParams.get("daerah");
+
   return (
     <div className="w-full h-screen pt-16">
-      <Map />
+      <Map selectedDaerahId={daerahId} />
     </div>
   );
 };

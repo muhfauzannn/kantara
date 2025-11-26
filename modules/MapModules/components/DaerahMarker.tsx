@@ -2,7 +2,7 @@
 
 import { Marker, Popup } from "react-leaflet";
 import { Icon, Marker as LeafletMarker } from "leaflet";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, forwardRef, useImperativeHandle } from "react";
 import DaerahPopup from "./DaerahPopup";
 
 interface DaerahData {
@@ -27,47 +27,61 @@ interface DaerahMarkerProps {
   icon: Icon;
 }
 
-export default function DaerahMarker({ daerah, icon }: DaerahMarkerProps) {
-  const markerRef = useRef<LeafletMarker | null>(null);
+const DaerahMarker = forwardRef<any, DaerahMarkerProps>(
+  ({ daerah, icon }, ref) => {
+    const markerRef = useRef<LeafletMarker | null>(null);
 
-  const markerIcon = useMemo(() => {
-    if (!daerah.icon) {
-      return icon;
-    }
+    useImperativeHandle(ref, () => ({
+      openPopup: () => {
+        if (markerRef.current) {
+          markerRef.current.openPopup();
+        }
+      },
+    }));
 
-    return new Icon({
-      ...icon.options,
-      iconUrl: daerah.icon,
-      iconRetinaUrl: daerah.icon,
-    });
-  }, [daerah.icon, icon]);
+    const markerIcon = useMemo(() => {
+      if (!daerah.icon) {
+        return icon;
+      }
 
-  const handleClick = () => {
-    if (markerRef.current) {
-      // Open popup on click
-      markerRef.current.openPopup();
-    }
-  };
+      return new Icon({
+        ...icon.options,
+        iconUrl: daerah.icon,
+        iconRetinaUrl: daerah.icon,
+      });
+    }, [daerah.icon, icon]);
 
-  return (
-    <Marker
-      ref={markerRef}
-      position={[daerah.latitude, daerah.longitude]}
-      icon={markerIcon}
-      eventHandlers={{
-        click: handleClick,
-      }}
-    >
-      {/* Popup for detailed information */}
-      <Popup
-        minWidth={320}
-        maxWidth={400}
-        closeButton={true}
-        autoPan={true}
-        className="custom-popup"
+    const handleClick = () => {
+      if (markerRef.current) {
+        // Open popup on click
+        markerRef.current.openPopup();
+      }
+    };
+
+    return (
+      <Marker
+        ref={markerRef}
+        position={[daerah.latitude, daerah.longitude]}
+        icon={markerIcon}
+        eventHandlers={{
+          click: handleClick,
+        }}
       >
-        <DaerahPopup daerah={daerah} />
-      </Popup>
-    </Marker>
-  );
-}
+        {/* Popup for detailed information */}
+        <Popup
+          minWidth={320}
+          maxWidth={400}
+          closeButton={true}
+          autoPan={true}
+          className="custom-popup"
+        >
+          <DaerahPopup daerah={daerah} />
+        </Popup>
+      </Marker>
+    );
+  }
+);
+
+DaerahMarker.displayName = "DaerahMarker";
+
+export default DaerahMarker;
